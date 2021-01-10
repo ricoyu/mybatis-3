@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2009-2020 the original author or authors.
+       Copyright 2009-2021 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
     <relativePath />
   </parent>
 
+  <groupId>com.loserico</groupId>
   <artifactId>mybatis</artifactId>
   <version>3.5.6</version>
   <packaging>jar</packaging>
@@ -289,6 +290,20 @@
         <configuration>
           <testCompilerArgument>${maven.compiler.testCompilerArgument}</testCompilerArgument>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
