@@ -1,17 +1,17 @@
 /**
- * Copyright 2009-2021 the original author or authors.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *    Copyright 2009-2021 the original author or authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.apache.ibatis.session;
 
@@ -279,15 +279,34 @@ public class Configuration {
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
     protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
+    /**
+     * select/update/delete/insert 语句解析到这里
+     */
     protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
         .conflictMessageProducer((savedValue, targetValue) ->
             ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+    /**
+     * 这里放的是Mybatis的二级缓存instance
+     */
     protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
     protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
     protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
     protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
+    /**
+     * 里面存的是这样的字符串:
+     * interface com.loserico.mybatis.eden.mapper.UserMapper
+     * 用于判断某个Mapper对应的Mapper.xml是否解析过
+     *
+     * 还会添加
+     * namespace:com.loserico.mybatis.eden.mapper.UserMapper
+     * 用于判断某个Mapper对应的Mapper.xml是否解析过 这个是结合Spring的时候为了防止重复解析吧?
+     */
     protected final Set<String> loadedResources = new HashSet<>();
+
+    /**
+     * XXXMapper.xml中的<sql><sql/>片段解析到这里
+     */
     protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
 
     protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
@@ -467,6 +486,13 @@ public class Configuration {
         loadedResources.add(resource);
     }
 
+    /**
+     * 判断resource是否已经加载过
+     * resource可以是一个接口全限定名 interface com.loserico.mybatis.eden.mapper.UserMapper
+     *         或者XXXMapper.xml路径 com/loserico/mybatis/eden/mapper/UserMapper.xml
+     * @param resource
+     * @return
+     */
     public boolean isResourceLoaded(String resource) {
         return loadedResources.contains(resource);
     }
