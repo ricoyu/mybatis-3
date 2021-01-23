@@ -59,6 +59,14 @@ public class DefaultSqlSession implements SqlSession {
         return this.selectOne(statement, null);
     }
 
+    /**
+     * 查询当个对象
+     *
+     * @param statement Unique identifier matching the statement to use.
+     * @param parameter A parameter object to pass to the statement.
+     * @param <T>
+     * @return
+     */
     @Override
     public <T> T selectOne(String statement, Object parameter) {
         // Popular vote was to return null on 0 results and throw exception on too many.
@@ -66,6 +74,9 @@ public class DefaultSqlSession implements SqlSession {
         if (list.size() == 1) {
             return list.get(0);
         } else if (list.size() > 1) {
+            /*
+             * 如果查询得到多个对象的话就抛异常
+             */
             throw new TooManyResultsException("Expected one result (or null) to be returned by selectOne(), but found: " + list.size());
         } else {
             return null;
@@ -132,7 +143,15 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
         try {
+            /*
+             * 第一步: 通过我们的statement去我们的全局配置类中获取MappedStatement
+             */
             MappedStatement ms = configuration.getMappedStatement(statement);
+            /*
+             * 通过执行器去执行我们的sql对象
+             * 1: 包装我们的集合类参数
+             * 2: 一般情况下是executor为cacheExetor对象
+             */
             return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -305,6 +324,11 @@ public class DefaultSqlSession implements SqlSession {
         return (!autoCommit && dirty) || force;
     }
 
+    /**
+     * 包装我们集合类的参数
+     * @param object
+     * @return
+     */
     private Object wrapCollection(final Object object) {
         return ParamNameResolver.wrapToMapIfCollection(object, null);
     }
